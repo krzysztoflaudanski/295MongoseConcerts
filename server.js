@@ -34,7 +34,7 @@ const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running on port: 8000');
 });
 
-mongoose.connect('mongodb://0.0.0.0:27017/concertDB', { useNewUrlParser: true });
+mongoose.connect('mongodb+srv://laudanskikrzysztof86:password100@cluster0.3qpkzhf.mongodb.net/ConcertsDB?retryWrites=true&w=majority', { useNewUrlParser: true });
 const db = mongoose.connection;
 
 db.once('open', () => {

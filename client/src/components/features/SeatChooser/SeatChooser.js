@@ -16,7 +16,6 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
     }, 120000);
     return () => {
       clearInterval(interval);
-      console.log(interval)
     }
   }, [dispatch])
 
