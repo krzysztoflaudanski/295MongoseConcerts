@@ -1,4 +1,5 @@
 const Testimonial = require('../models/testimonial.model');
+const mongoose = require('mongoose');
 
 exports.getAll = async (req, res) => {
     try {
@@ -25,15 +26,17 @@ exports.getRandom = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-
-    try {
-        const tes = await Testimonial.findById(req.params.id);
-        if (!tes) res.status(404).json({ message: 'Not found' });
-        else res.json(tes);
-    }
-    catch (err) {
-        res.status(500).json({ message: err });
-    }
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(501).json({ message: 'Invalid UUID' });
+    } else
+        try {
+            const tes = await Testimonial.findById(req.params.id);
+            if (!tes) res.status(404).json({ message: 'Not found' });
+            else res.json(tes);
+        }
+        catch (err) {
+            res.status(500).json({ message: err });
+        }
 
 };
 
@@ -54,35 +57,39 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => {
     const { author, text } = req.body;
-
-    try {
-        const tes = await Testimonial.findById(req.params.id);
-        if (tes) {
-            tes.author = author;
-            tes.text = text;
-            await tes.save();
-            res.json({ message: 'OK' });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(501).json({ message: 'Invalid UUID' });
+    } else
+        try {
+            const tes = await Testimonial.findById(req.params.id);
+            if (tes) {
+                tes.author = author;
+                tes.text = text;
+                await tes.save();
+                res.json({ message: 'OK' });
+            }
+            else res.status(404).json({ message: 'Not found...' });
         }
-        else res.status(404).json({ message: 'Not found...' });
-    }
-    catch (err) {
-        res.status(500).json({ message: err });
-    }
+        catch (err) {
+            res.status(500).json({ message: err });
+        }
 
 };
 
 exports.delete = async (req, res) => {
-
-    try {
-        const tes = await Testimonial.findById(req.params.id);
-        if (tes) {
-            await Testimonial.deleteOne({ _id: req.params.id });
-            res.json({ message: 'OK' });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(501).json({ message: 'Invalid UUID' });
+    } else
+        try {
+            const tes = await Testimonial.findById(req.params.id);
+            if (tes) {
+                await Testimonial.deleteOne({ _id: req.params.id });
+                res.json({ message: 'OK' });
+            }
+            else res.status(404).json({ message: 'Not found...' });
         }
-        else res.status(404).json({ message: 'Not found...' });
-    }
-    catch (err) {
-        res.status(500).json({ message: err });
-    }
+        catch (err) {
+            res.status(500).json({ message: err });
+        }
 
 };

@@ -1,4 +1,5 @@
 const Seat = require('../models/seat.model');
+const mongoose = require('mongoose');
 
 exports.getAll = async (req, res) => {
   try {
@@ -10,15 +11,17 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-
-  try {
-    const seat = await Seat.findById(req.params.id);
-    if (!seat) res.status(404).json({ message: 'Not found' });
-    else res.json(seat);
-  }
-  catch (err) {
-    res.status(500).json({ message: err });
-  }
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(501).json({ message: 'Invalid UUID' });
+  } else
+    try {
+      const seat = await Seat.findById(req.params.id);
+      if (!seat) res.status(404).json({ message: 'Not found' });
+      else res.json(seat);
+    }
+    catch (err) {
+      res.status(500).json({ message: err });
+    }
 
 };
 
@@ -39,37 +42,41 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => {
   const { day, seat, client, email } = req.body;
-
-  try {
-    const sea = await Seat.findById(req.params.id);
-    if (sea) {
-      sea.day = day;
-      sea.seat = seat;
-      sea.client = client;
-      sea.email = email;
-      await sea.save();
-      res.json({ message: 'OK' });
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(501).json({ message: 'Invalid UUID' });
+  } else
+    try {
+      const sea = await Seat.findById(req.params.id);
+      if (sea) {
+        sea.day = day;
+        sea.seat = seat;
+        sea.client = client;
+        sea.email = email;
+        await sea.save();
+        res.json({ message: 'OK' });
+      }
+      else res.status(404).json({ message: 'Not found...' });
     }
-    else res.status(404).json({ message: 'Not found...' });
-  }
-  catch (err) {
-    res.status(500).json({ message: err });
-  }
+    catch (err) {
+      res.status(500).json({ message: err });
+    }
 
 };
 
 exports.delete = async (req, res) => {
-
-  try {
-    const seat = await Seat.findById(req.params.id);
-    if (seat) {
-      await Seat.deleteOne({ _id: req.params.id });
-      res.json({ message: 'OK' });
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(501).json({ message: 'Invalid UUID' });
+  } else
+    try {
+      const seat = await Seat.findById(req.params.id);
+      if (seat) {
+        await Seat.deleteOne({ _id: req.params.id });
+        res.json({ message: 'OK' });
+      }
+      else res.status(404).json({ message: 'Not found...' });
     }
-    else res.status(404).json({ message: 'Not found...' });
-  }
-  catch (err) {
-    res.status(500).json({ message: err });
-  }
+    catch (err) {
+      res.status(500).json({ message: err });
+    }
 
 };
